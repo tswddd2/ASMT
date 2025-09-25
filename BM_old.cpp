@@ -120,7 +120,7 @@ void BipGraph::calcMIS() {
 }
 
 int tmain() {
-    freopen("C:\\Users\\tswdd\\Desktop\\AMCT\\inp2.txt", "r", stdin);
+    freopen("inp2.txt", "r", stdin);
     int m, n;
     cin >> m >> n;
     BipGraph g(m, n);

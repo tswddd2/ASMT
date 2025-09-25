@@ -27,7 +27,6 @@ struct Leaf
 struct TreeNode
 {
 	vector<int> leaves, rleaves;
-	vector<int> subtreeLeaves;    	// for testing
 	vector<int> sons;
 	set<Node> rsons;
 	int size, depth, father;        // size: leaf count in subtree
@@ -91,30 +90,6 @@ int buildTree(int treeId, int fatherId, int index)
 
     return index;
 }
-void getSubtreeLeaves(int treeId, int nodeId) {
-	if (trees[treeId][nodeId].sons.size() == 0) {
-		trees[treeId][nodeId].subtreeLeaves.push_back(trees[treeId][nodeId].leaves[0]);
-		return;
-	}
-	trees[treeId][nodeId].subtreeLeaves.clear();
-	for (int son : trees[treeId][nodeId].sons) {
-		getSubtreeLeaves(treeId, son);
-		for (int leaf : trees[treeId][son].subtreeLeaves)
-			trees[treeId][nodeId].subtreeLeaves.push_back(leaf);
-	}
-	sort(trees[treeId][nodeId].subtreeLeaves.begin(), trees[treeId][nodeId].subtreeLeaves.end());
-}
-string printNode(int treeId, int nodeId) {
-	stringstream ss;
-	ss << nodeId << ":(";
-	for (int leaf : trees[treeId][nodeId].subtreeLeaves) {
-		if (leaf != trees[treeId][nodeId].subtreeLeaves[0])
-			ss << " ";
-		ss << leaf;
-	}
-	ss << ")";
-	return ss.str();
-}
 
 vector<vector<int>> overlapSize;				// overlapSize[i][j]: overlap leaf size of trees[0][i] and trees[1][j]
 vector<pair<int, int>> bipartiteEdges;			// edges for bipartite graph
@@ -143,13 +118,12 @@ void getBipartiteEdges(int u, int v) {
 
 	if (overlapSize[u][v] > 0 && overlapSize[u][v] < min(trees[0][u].size, trees[1][v].size)) {
 		bipartiteEdges.push_back(make_pair(u, v));	// u->v
-		// cout << printNode(0, u) << " " << printNode(1, v) << " : " << overlapSize[u][v] << endl;
 	}
 }
 
 void init()
 {
-	ifstream fin("C:\\Users\\tswdd\\Desktop\\AMCT\\inp.txt");
+	ifstream fin("inp.txt");
 	fin >> n;
 	leaves.resize(n, Leaf());
 	fin >> treeStr;
@@ -157,10 +131,6 @@ void init()
 
 	fin >> treeStr;
 	buildTree(1, -1, 1);
-
-	// testing only
-	getSubtreeLeaves(0, 0);
-	getSubtreeLeaves(1, 0);
 
     overlapSize.resize(trees[0].size());
     for (int i = 0; i < trees[0].size(); i++) {
@@ -170,17 +140,14 @@ void init()
 
 void bipartiteMap() {
 
-	ofstream fout("C:\\Users\\tswdd\\Desktop\\AMCT\\debug.txt");
+	ofstream fout("debug.txt");
 
 	getBipartiteEdges(0, 0);
 	BipGraph g(trees[0].size(), trees[1].size());
-	// test to sort edges
-	sort(bipartiteEdges.begin(), bipartiteEdges.end());
 	fout << trees[0].size() << ' ' << trees[1].size() << ' ' << bipartiteEdges.size() << '\n';
 	for (auto e : bipartiteEdges) {
 		g.addEdge(e.first+1, e.second+1);
 		fout << e.first+1 << " " << e.second+1 << '\n';
-		// cout << printNode(0, e.first) << " " << printNode(1, e.second) << '\n';
 	}
 	g.hopcroftKarp();
 	g.calcMIS();
@@ -209,7 +176,6 @@ Node find(Node c) {
 }
 
 void dfs1(int treeId, int nodeId, int fatherId) {
-	// cout << treeId << ' ' << nodeId << ' ' << fatherId << '\n';
 	Node father = { treeId, fatherId }, tson;
 	Node now = { treeId, nodeId };
 	if (nodeId != fatherId && Trees(now).sel) {
@@ -281,7 +247,7 @@ void print() {
 		dfs1(oc.x[1], oc.y, oc.y);
 
 	dfs2({ 0, 0 });
-	ofstream fout("C:\\Users\\tswdd\\Desktop\\AMCT\\oup.txt");
+	ofstream fout("oup.txt");
 	fout << output << '\n';
 }
 

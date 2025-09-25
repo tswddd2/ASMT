@@ -66,7 +66,7 @@ string treeToString(TreeNode* root) {
 }
 
 int main() {
-    freopen("C:\\Users\\tswdd\\Desktop\\AMCT\\inp.txt", "w", stdout);
+    freopen("inp.txt", "w", stdout);
     int n = N;
     TreeNode* root1 = randomBinaryTree(n);
     TreeNode* root2 = randomBinaryTree(n);

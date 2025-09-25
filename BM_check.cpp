@@ -93,7 +93,7 @@ int main() {
         cout << "BM old MIS size: " << mis1 << ", " << elapsed << " seconds\n";
 
         // test BM new
-        ofstream fout = ofstream("C:\\Users\\tswdd\\Desktop\\AMCT\\inp2.txt");
+        ofstream fout = ofstream("inp2.txt");
         fout << n1 << ' ' << n2 << ' ' << interval1.size() << '\n';
         for (int i = 0; i < interval1.size(); i++)
             fout << interval1[i].first << ' ' << interval1[i].second << ' ' << interval2[i].first << ' ' << interval2[i].second << '\n';
@@ -102,7 +102,7 @@ int main() {
         system("BM_new.exe");
         clock_t end2 = clock();
         double elapsed2 = double(end2 - start2) / CLOCKS_PER_SEC;
-        ifstream fin = ifstream("C:\\Users\\tswdd\\Desktop\\AMCT\\inp3.txt");
+        ifstream fin = ifstream("inp3.txt");
         int mis2;
         fin >> mis2;
         fin.close();

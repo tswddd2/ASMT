@@ -233,7 +233,7 @@ bool dfs(gNode w) {
 }
 
 void ginit() {
-	ifstream fin("C:\\Users\\tswdd\\Desktop\\AMCT\\inp2.txt");
+	ifstream fin("inp2.txt");
 	int x0, y0, x1, y1;
 	fin >> gn[0] >> gn[1] >> m;
 	seg[0].clear(); seg[1].clear();
@@ -330,7 +330,7 @@ void travel(gNode v) {
 }
 
 void gprint() {
-    ofstream fout("C:\\Users\\tswdd\\Desktop\\AMCT\\inp3.txt");
+    ofstream fout("inp3.txt");
 	fout << gn[0] + gn[1] - gcnt << '\n';
 	tBuild(1);
 	bFill(0, unv);

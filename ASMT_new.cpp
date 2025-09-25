@@ -78,8 +78,6 @@ int buildTree(int treeId, int fatherId, int index)
 	trees[treeId][nodeId].father = fatherId;
 	trees[treeId][nodeId].depth = (fatherId >= 0 ? trees[treeId][fatherId].depth + 1 : 0);
 
-	//cout << "in " << nodeId << '\n';
-
 	while (treeStr[index] != ')') {
 		if (treeStr[index] == '|')
 			index++;
@@ -103,16 +101,6 @@ int buildTree(int treeId, int fatherId, int index)
 		}
 		else throw "input format error";
 	}
-
-	//cout << "out " << nodeId << '\n';
-	/*cout << "==== " << nodeId << " ====\n";
-	cout << "size: " << trees[treeId][nodeId].size << " depth: " << trees[treeId][nodeId].depth << " father: " << trees[treeId][nodeId].father << '\n';
-	cout << "sons: ";
-	for (auto i : trees[treeId][nodeId].sons)
-		cout << i << ' '; cout << "\n";
-	cout << "leaves: ";
-	for (auto i : trees[treeId][nodeId].leaves)
-		cout << i << ' '; cout << "\n\n"; */
 
 	return index;
 }
@@ -152,31 +140,19 @@ void buildCentroidPaths(int treeId, int nodeId, int pathId, int fatherPath = -1)
 
 	//cout << nodeId << ' ' << trees[treeId][nodeId].pnum << ' ' << trees[treeId][nodeId].pathId << '\n';
 }
-void printPath(int treeId)
-{
-	int pathId = 0;
-	cout << "\n";
-	for (auto p : paths[treeId]) {
-		cout << pathId << " top: " << p.top << " bottom: " << p.bottom << " fatherPath: " << p.father << '\n';
-		pathId++;
-	}
-	cout << '\n';
-}
 
 void init()
 {
-	ifstream fin("C:\\Users\\tswdd\\Desktop\\AMCT\\inp.txt");
+	ifstream fin("inp.txt");
 	fin >> n;
 	leaves.resize(n, Leaf());
 	fin >> treeStr;
 	buildTree(0, -1, 1);
 	buildCentroidPaths(0, 0, 0);
-	// printPath(0);
 
 	fin >> treeStr;
 	buildTree(1, -1, 1);
 	buildCentroidPaths(1, 0, 0);
-	// printPath(1);
 
 	// for each leaf: find overlap path pairs
 	vector<Traid> pathPairsByLeaf;
@@ -197,10 +173,6 @@ void init()
 	}
 	sort(pathPairsByLeaf.begin(), pathPairsByLeaf.end(), compTraid);
 
-	// cout << "size " << pathPairsByLeaf.size() << '\n';
-	// for (auto t : pathPairsByLeaf)
-	// 	cout << t.x[0] << ' ' << t.x[1] << ' ' << t.y << '\n';
-
 	// aggregate overlap leaf set to path pairs
 	for (int index = 0; index < pathPairsByLeaf.size(); ) {
 		PathPair pathPair;
@@ -215,13 +187,6 @@ void init()
 		}
 		pathPairs.push_back(pathPair);
 	}
-
-	// for (auto pathPair : pathPairs) {
-	// 	cout << pathPair.pathId[0] << ' ' << pathPair.pathId[1] << '\n';
-	// 	for (auto leaf : pathPair.leaves)
-	// 		cout << leaf << ' ';
-	// 	cout << '\n';
-	// }
 }
 
 vector<PathNode> pathNodes[2];
@@ -232,7 +197,6 @@ void getPathNodes(int treeId, PathPair pathPair)
 	int pathId = pathPair.pathId[treeId];
 	int top = trees[treeId][paths[treeId][pathId].top].vertexId;
 	int bottom = trees[treeId][paths[treeId][pathId].bottom].vertexId;
-	//cout << "---\n";
 
 	// for each overlap leaf, find the first ancestor contained in path
 	for (auto leafId : pathPair.leaves) {
@@ -245,7 +209,6 @@ void getPathNodes(int treeId, PathPair pathPair)
 			nodeId = paths[treeId][trees[treeId][nodeId].pathId].top;
 			nodeId = trees[treeId][nodeId].father;
 		}
-		//cout << leafId << " vnum: " << vnum << '\n';
 		traid.x[0] = nodeId;
 		traid.y = leafId;
 		traids.push_back(traid);
@@ -274,7 +237,6 @@ void getPathNodes(int treeId, PathPair pathPair)
 		pathNode.overlapSize = overlapSize;
 		if (trees[treeId][pathNode.nodeId].size == overlapSize)
 			pathNode.neated = 1;
-		//cout << ppi.nodeId << ' ' << snum << ' ' << trees[treeId][ppi.nodeId].size << '\n';
 	}
 }
 
@@ -311,7 +273,6 @@ void calculate(int ppid) {
             vb[leaf]++; if (vb[leaf] == 2) b2++;
         }
     }
-	// cout << ai << ' ' << bi << ' ' << rel << '\n';
 
     tres.clear();
     previous = r0;
@@ -331,14 +292,10 @@ void calculate(int ppid) {
                     vb[leaf]--; if (vb[leaf] == 1) b2--;
                 }
                 bi++;
-                // cout << "red\n" << bi << '\n';
-                // for (auto leaf : vb)
-                //     cout << leaf << ' '; cout << '\n';
             }
         }
         // when bi and pni no longer overlap, set rel to 0
         if (b2 == 0) {  
-			// cout << "change: " << bi << '\n';
             rel = 0;
 		}
         // rel is 0: move up bi if bi is disjoint to pni
@@ -351,7 +308,6 @@ void calculate(int ppid) {
                 }
             }
         }
-        // cout << ai << ' ' << bi << ' ' << rel << '\n';
 
         // step 2: get interval pairs for current pni
         // last & now: vertexId of left interval
@@ -362,14 +318,10 @@ void calculate(int ppid) {
         if (previous < now && tb >= r1) {           //bi - rel >= 0 before change
             Quad tmp = { {previous, now - 1} , {r1, tb} };
             tres.push_back(tmp);
-            // cout << "bef\n" << tmp.x[0] << ' ' << tmp.x[1] << ' ' << tmp.y[0] << ' ' << tmp.y[1] << '\n';
-			// cout << "rel: " << rel << '\n';
         }
         if (ta <= tb) {                             //ai <= bi - rel before change
             Quad tmp = { {now, now} , {ta, tb} };
             tres.push_back(tmp);
-            // cout << tmp.x[0] << ' ' << tmp.x[1] << ' ' << tmp.y[0] << ' ' << tmp.y[1] << '\n';
-            // cout << "rel: " << rel << '\n';
         }
 
         // pni go down: reduce frequency of leaves
@@ -400,31 +352,16 @@ void work() {
 	vb.resize(n, 0);
 	for (int i = 0; i < pathPairs.size(); i++) {
 		PathPair pathPair = pathPairs[i];
-		/*cout << "------\n" << pathPair.pathId[0] << ' ' << pathPair.pathId[1] << '\n';
-		for (auto leaf : pathPair.leaves)
-			cout << leaf << ' '; cout << '\n'; */
 
 		getPathNodes(0, pathPair);
 		getPathNodes(1, pathPair);
-
-		/*cout << "---t1---\n";
-		for (auto pn : pnodes[0]) {
-			cout << pn.pnum << " neated: " << pn.neated << " size: " << pn.size << "\nleaves: ";
-			for (auto leaf : pn.leaves)
-				cout << leaf << ' '; cout << '\n';
-		} cout << "---t2---\n";
-		for (auto pn : pnodes[1]) {
-			cout << pn.pnum << " neated: " << pn.neated << " size: " << pn.size << "\nleaves: ";
-			for (auto leaf : pn.leaves)
-				cout << leaf << ' '; cout << '\n';
-		} cout << '\n'; */
 
 		calculate(i);
 	}
 }
 
 void print() {
-	ofstream fout("C:\\Users\\tswdd\\Desktop\\AMCT\\inp2.txt");
+	ofstream fout("inp2.txt");
 	fout << trees[0].size() << ' ' << trees[1].size() << ' ' << result.size() << '\n';
 	for (auto res : result) {
 		fout << res.x[0] << ' ' << res.x[1] << ' ' << res.y[0] << ' ' << res.y[1] << '\n';
@@ -466,7 +403,7 @@ void cal() {
 			color[i][j] = { i, j };
 		}
 
-	ifstream fin("C:\\Users\\tswdd\\Desktop\\AMCT\\inp3.txt");
+	ifstream fin("inp3.txt");
 	fin >> k;
 	for (int i = 0; i < k; i++) {
 		int treeId, nodeId, pnum;
@@ -484,7 +421,6 @@ void cal() {
 }
 
 void dfs1(int treeId, int nodeId, int fatherId) {
-	// cout << treeId << ' ' << nodeId << ' ' << fatherId << '\n';
 	Node father = { treeId, fatherId }, tson;
 	Node now = { treeId, nodeId };
 	if (nodeId != fatherId && Trees(now).sel) {
@@ -541,24 +477,9 @@ void dfs2(Node now) {
 void stage2() {
 	for (auto oc : order)
 		dfs1(oc.x[1], oc.y, oc.y);
-	// cout << "dfs1\n";
-
-	// for (int i = 0; i < 2; i++) {
-	// 	for (int j = 0; j < trees[i].size(); j++) {
-	// 		Node now = {i, j};
-	// 		if (Trees(now).sel) {
-	// 			cout << "--[" << i << ',' << j << "]--\nleaves: ";
-	// 			for (auto leaf : Trees(now).rleaves)
-	// 				cout << leaf << ' '; cout << "\nsons: ";
-	// 			for (auto son : Trees(now).rsons)
-	// 				cout << '[' << son.treeId << ',' << son.nodeId << "] "; cout << '\n';
-	// 		}
-	// 	} cout << '\n';
-	// }
 
 	dfs2({ 0, 0 });
-	// cout << output << '\n';
-	ofstream fout("C:\\Users\\tswdd\\Desktop\\AMCT\\oup.txt");
+	ofstream fout("oup.txt");
 	fout << output << '\n';
 }
 
