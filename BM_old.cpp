@@ -32,10 +32,6 @@ int BipGraph::hopcroftKarp() {
             if (pairU[u] == NIL && dfs(u))
                 result++;
     }
-    // for (int u = 0; u <= m; u++) cout << pairU[u] << " ";
-    // cout << endl;
-    // for (int v = 0; v <= n; v++) cout << pairV[v] << " ";
-    // cout << endl;
     return result;
 }
 
@@ -89,11 +85,11 @@ void BipGraph::addEdge(int u, int v) {
     adj[u].push_back(v);
 }
 
-// 标记所有可达点
+// Mark reachable vertices from free vertices in U
 void BipGraph::dfs_mark(int u) {
     visU[u] = true;
     for (int v : adj[u]) {
-        if (!visV[v] && pairU[u] != v) { // 没访问过且不是匹配边
+        if (!visV[v] && pairU[u] != v) { // Not visited and not a matching edge
             visV[v] = true;
             if (pairV[v] && !visU[pairV[v]])
                 dfs_mark(pairV[v]);
@@ -101,38 +97,20 @@ void BipGraph::dfs_mark(int u) {
     }
 }
 
-// 求最大独立点集
+// Find maximum independent set
 void BipGraph::calcMIS() {
     visU.assign(m + 1, false);
     visV.assign(n + 1, false);
-    // 从所有未匹配的左侧点出发
+    // Start from all unmatched vertices in U
     for (int u = 1; u <= m; u++) {
         if (pairU[u] == NIL && !visU[u]) {
             dfs_mark(u);
         }
     }
     for (int u = 1; u <= m; u++) {
-        if (visU[u]) MIS_U.push_back(u); // 未访问的左侧
+        if (visU[u]) MIS_U.push_back(u);
     }
     for (int v = 1; v <= n; v++) {
-        if (!visV[v]) MIS_V.push_back(v); // 访问过的右侧
+        if (!visV[v]) MIS_V.push_back(v); 
     }
-}
-
-int tmain() {
-    freopen("inp2.txt", "r", stdin);
-    int m, n;
-    cin >> m >> n;
-    BipGraph g(m, n);
-    int a, b;
-    while (cin >> a >> b) {
-        g.addEdge(a + 1, b + 1); // 1-based
-    }
-    clock_t begin = clock();
-    int max_match = g.hopcroftKarp();
-    // cout << "Max Matching:" << max_match << endl;
-    g.calcMIS();
-    // clock_t end = clock();
-    // cout << "Running Time: " << double(end - begin) / CLOCKS_PER_SEC << " seconds" << endl;
-    return 0;
 }
