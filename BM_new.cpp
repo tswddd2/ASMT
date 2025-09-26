@@ -37,13 +37,10 @@ int bGetOne(int l, int r, set<int> &b) {
 	}
 	return -1;
 }
-int ggg = 0;
 void bGetList(int l, int r, set<int> &b, vector<int> &res) {
 	res.clear();
 	seti lb = b.lower_bound(l), ub = b.upper_bound(r);
-	if (ggg) cout << *lb << ' ' << *ub << '\n';
 	for (seti i = lb; i != ub; i++) {
-        if (ggg) cout << *i << '\n';
 		res.push_back(*i);
 	}
 	b.erase(lb, ub);
@@ -70,12 +67,10 @@ int buildIntervalTree(int l, int r) {
 		now.rson = buildIntervalTree(mid + 1, r);
 	}
 	intervalTree[x] = now;
-	//cout << x << ' ' << intervalTree[x].l << ' ' << intervalTree[x].r << ' ' << intervalTree[x].lson << ' ' << intervalTree[x].rson << '\n';
 	return x;
 }
 void addInterval(int x, int l, int r, int sid) {
 	int sl = intervalTree[x].l, sr = intervalTree[x].r;
-	//cout << sl << ' ' << sr << '\n';
 	int mid = (sl + sr) / 2;
 	if (l <= sl && sr <= r) {
 		intervalTree[x].sid.push_back(sid);
@@ -96,26 +91,19 @@ void tBuild(int gi) {
 	remlable.resize(m, 0);
 	for (int i = 0; i < seg[gi].size(); i++) {
 		Segment s = seg[gi][i];
-		//cout << "addInterval " << s.l << ' ' << s.r << "\n";
 		addInterval(0, s.l, s.r, i);
 	}
 }
 int tGetOne(int y, int x) {
-	// cout << "going " << y << ' ' << x << '\n';
 	tLastX = x;
 	int sl = intervalTree[x].l, sr = intervalTree[x].r;
-	// cout << x << ' ' << sl << ' ' << sr << ' ' << intervalTree[x].sid.size() << '\n';
 	while (intervalTree[x].sid.size() > 0) {
 		int sid = *intervalTree[x].sid.begin();
-		// cout << remlable.size() << '\n';
-		// cout << sid << ' ' << remlable[sid] << '\n';
 		if (!remlable[sid])
 			return sid;
 		else
 			intervalTree[x].sid.erase(intervalTree[x].sid.begin());
-		// cout << "while\n";
 	}
-	// cout << "while done\n";
 	if (sl < sr)
 	{
 		int mid = (sl + sr) / 2;
@@ -131,9 +119,7 @@ void tGetList(int y, vector<int> &lip) {
 	lip.clear();
 	tLastX = 0;
 	while (true) {
-		// cout << "go" << ' ' << y << ' ' << tLastX << '\n';
 		int sid = tGetOne(y, tLastX);
-		// cout << "go done\n";
 		if (sid >= 0) {
 			lip.push_back(sid);
 			tRemove(sid);
@@ -151,7 +137,6 @@ vector<int> level[2], gsel[2], gres, cover;
 vector<gNode> nodeQueue, match[2], gpath;
 int term, depth, gcnt = 0;
 
-#define Print(c) '[' << c.gi << ',' << c.nid << ']'
 void bfs() {
 	int p = 0, ext = -1;
 	nodeQueue.clear();
@@ -173,15 +158,12 @@ void bfs() {
 		gNode u = nodeQueue[p];
 		if (ext >= 0 && Level(u) > ext)
 			break;
-        // cout << Print(u) << ":\n";
 		tGetList(u.nid, cover);
-		// cout << "cover: \n";
 		for (auto sid : cover) {
 			int l = seg[1][sid].l, r = seg[1][sid].r;
 			bGetList(l, r, unv, gres);
 			for (auto vid : gres) {
 				gNode v = { 1, vid };
-                // cout << "v: " << Print(v) << '\n';
 				Level(v) = Level(u) + 1;
 				if (!Null(Match(v))) {
 					gNode gnew = Match(v);
@@ -190,7 +172,6 @@ void bfs() {
 				}
 				else
 					ext = Level(v);
-				// cout << "push " << Print(v) << '\n';
 			}
 		}
 		p++;
@@ -201,7 +182,6 @@ void bfs() {
 }
 
 bool dfs(gNode w) {
-	//cout << Print(w) << ":\n";
 	int d = Level(w);
 	if (d == 0)
 		return true;
@@ -215,7 +195,6 @@ bool dfs(gNode w) {
 			int sid = tGetOne(w.nid, tLastX);
 			if (sid == -1) break;
 			int sl = seg[0][sid].l, sr = seg[0][sid].r;
-			//cout << sid << ' ' << sl << ' ' << sr << '\n';
 			while (true) {
 				int res = bGetOne(sl, sr, B[d - 1]);
 				if (res == -1) break;
@@ -242,17 +221,6 @@ void ginit() {
 		seg[0].push_back({ x0, y0 });
 		seg[1].push_back({ x1, y1 });
 	}
-
-	// testing part
-	/*vector<int> res;
-	tBuild(0);
-	int tmp;
-	while (cin >> tmp) {
-		if (tmp == -1) break;
-		tGetList(tmp, res);
-		for (auto r : res)
-			cout << r << ' ' << seg[0][r].l << ' ' << seg[0][r].r << '\n';
-	} */
 }
 
 void gwork() {
@@ -262,17 +230,6 @@ void gwork() {
 	}
 
 	while (true) {
-		// cout << "\nbfs:\n";
-		// cout << depth << '\n';
-		bfs();
-		// cout << "level:\n";
-        
-		// for (int gi = 0; gi < 2; gi++) {
-		// 	for (int i = 0; i < gn[gi]; i++)
-		// 		if (level[gi][i] > 0)
-		// 			cout << '[' << i << ',' << level[gi][i] << "] "; cout << '\n';
-		// }
-
 		if (term) return;
 		tBuild(1);
 		B.clear();
@@ -285,32 +242,17 @@ void gwork() {
 		for (int vi = 0; vi < gn[1]; vi++) {
 			gNode v = { 1, vi };
 			if (Level(v) == depth - 1) {
-				//cout << "\ndfs: " << Print(v) << '\n';
 				gpath.clear();
 				if (Null(Match(v)) && dfs(v)) {
-					//cout << "success\n";
 					gcnt++;
 					for (int i = gpath.size() - 1; i > 0; i -= 2) {
-						//cout << gpath[i].nid << " -> " << gpath[i - 1].nid;
 						gNode nu = gpath[i], nv = gpath[i - 1];
-						//if (i > 1) cout << " -> ";
 						Match(nu) = nv;
 						Match(nv) = nu;
 					}
-					//cout << '\n';
 				}
 			}
 		}
-
-		//cout << "\nmatch:\n";
-		//cout << gcnt << '\n';
-		/*
-		for (int gi = 0; gi < 2; gi++) {
-			for (int i = 0; i < gn[gi]; i++)
-				if (match[gi][i].nid > -1)
-					//cout << '[' << i << "," << match[gi][i].nid << "] "; cout << '\n';
-		}*/
-		//cout << '\n';
 	}
 }
 
