@@ -3,11 +3,12 @@
 #include <random>
 #include <ctime>
 #include <string>
+#include <fstream>
 using namespace std;
 
 int N = 10;
+double R = 0.3;
 
-// Generalized tree node structure
 struct TreeNode {
     int label; // label of leaf node, -1 for internal nodes
     vector<TreeNode*> children;
@@ -45,6 +46,30 @@ TreeNode* randomBinaryTree(int N) {
     return nodes[0];
 }
 
+// Contract edges with probability r
+void contractEdges(TreeNode* root, double r) {
+    if (!root) return;
+    vector<TreeNode*>& ch = root->children;
+    for (size_t i = 0; i < ch.size(); ) {
+        TreeNode* child = ch[i];
+        uniform_real_distribution<double> dist(0.0, 1.0);
+        bool do_contract = (dist(rng) < r);
+        if (do_contract && child->label == -1) {
+            // Contract this edge: remove child, merge its children into root
+            ch.erase(ch.begin() + i);
+            ch.insert(ch.begin() + i, child->children.begin(), child->children.end());
+            // Detach pointers from child (so destructor doesn't double-free)
+            child->children.clear();
+            delete child;
+            // Do not increment i, as new children are now at i
+        } else {
+            // Recurse into child
+            contractEdges(child, r);
+            ++i;
+        }
+    }
+}
+
 // Generate string representation (children separated by "|")
 string treeToString(TreeNode* root) {
     if (!root) return "";
@@ -62,12 +87,20 @@ string treeToString(TreeNode* root) {
 }
 
 int main() {
-    freopen("inp.txt", "w", stdout);
+    ofstream fout("inp.txt");
     int n = N;
     TreeNode* root1 = randomBinaryTree(n);
     TreeNode* root2 = randomBinaryTree(n);
-    cout << n << '\n';
-    cout << treeToString(root1) << '\n';
-    cout << treeToString(root2) << '\n';
+
+    double r = R;
+
+    contractEdges(root1, r);
+    contractEdges(root2, r);
+
+    fout << n << '\n';
+    fout << treeToString(root1) << '\n';
+    fout << treeToString(root2) << '\n';
+    delete root1;
+    delete root2;
     return 0;
 }
