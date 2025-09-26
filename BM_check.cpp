@@ -4,7 +4,7 @@
 #include "BM_old.cpp"
 using namespace std;
 
-const int N = 1000000, Trials = 10;
+const int N = 10000, Trials = 10;
 
 void init_rand() {
     srand(static_cast<unsigned int>(time(0)));
@@ -14,28 +14,6 @@ int rand_n(int n) {
 }
 
 vector<pair<int, int>> edges, interval1, interval2;
-void generateEdges(int n1, int n2) {
-    edges.clear();
-    interval1.clear();
-    interval2.clear();
-
-    int sqrtn = (int)sqrt(n2);
-    for (int i = 0; i < n1; i++) {
-        int deg = rand_n(sqrtn) + 1;
-        set<int> neighbors;
-        while (neighbors.size() < deg) {
-            int neighbor = rand_n(n2);
-            neighbors.insert(neighbor);
-        }
-        for (int neighbor : neighbors) {
-            if (i < neighbor) {
-                edges.push_back({i, neighbor});
-                interval1.push_back({i, i});
-                interval2.push_back({neighbor, neighbor});
-            }
-        }
-    }
-}
 
 void generateIntervalPairs(int n1, int n2) {
     edges.clear();
@@ -66,13 +44,15 @@ void generateIntervalPairs(int n1, int n2) {
 
 
 int main() {
+    int n1, n2;
+    cout << "Enter n (number of left and right nodes): ";
+    cin >> n1; n2 = n1;
     init_rand(); 
 
     for (int trial = 0; trial < Trials; trial++) {
 
         cout << "Trial " << trial + 1 << ":\n";
 
-        int n1 = N, n2 = N;
         int sqrtn = (int)sqrt(n2);
         int m = 0;
 
