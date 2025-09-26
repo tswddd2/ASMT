@@ -86,13 +86,21 @@ string treeToString(TreeNode* root) {
     }
 }
 
-int main() {
-    ofstream fout("inp.txt");
+int main(int argc, char* argv[]) {
     int n = N;
+    double r = R;
+    if (argc >= 2) {
+        n = atoi(argv[1]);
+        if (n <= 0) n = N;
+    }
+    if (argc >= 3) {
+        r = atof(argv[2]);
+        if (r < 0 || r > 1) r = R;
+    }
+
+    ofstream fout("inp.txt");
     TreeNode* root1 = randomBinaryTree(n);
     TreeNode* root2 = randomBinaryTree(n);
-
-    double r = R;
 
     contractEdges(root1, r);
     contractEdges(root2, r);
